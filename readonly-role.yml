@@ -1,0 +1,29 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  CloudFormation template to create an IAM role with read-only access
+  to common AWS resources like EC2, S3, RDS, Lambda, CloudWatch, etc.
+
+Resources:
+  ReadOnlyIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ReadOnlyAccessRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+                - lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/ReadOnlyAccess
+
+Outputs:
+  RoleName:
+    Description: Name of the IAM Role created
+    Value: !Ref ReadOnlyIAMRole
+  RoleARN:
+    Description: ARN of the IAM Role created
+    Value: !GetAtt ReadOnlyIAMRole.Arn
