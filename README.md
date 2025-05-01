@@ -1,60 +1,105 @@
+
 # AWS ReadOnlyAccess CloudFormation & Resource Fetch Script
 
-This project demonstrates how to create an IAM Role with read-only permissions using CloudFormation and dynamically fetch AWS resource inventory using a Python script.
-
----
+This project demonstrates how to create an IAM Role with read-only permissions using AWS CloudFormation and dynamically fetch AWS resource inventory (EC2 and S3) using a Python script.
 
 ## 📁 Files Included
 
-- `readonly-role.yml`: CloudFormation template to create the IAM role.
-- `fetch_stack_inventory.py`: Python script to list EC2 and S3 resources after stack creation.
-- `README.md`: Instructions and documentation.
-
----
+- **`readonly-role.yml`**: CloudFormation template to create the IAM role with read-only access to EC2 and S3.
+- **`fetch_stack_inventory.py`**: Python script to fetch EC2 and S3 resources after stack creation.
+- **`README.md`**: Instructions and documentation on how to use the CloudFormation template and the Python script.
 
 ## 🛠 How to Use
 
 ### Step 1: Upload the YAML Template
 
-Upload `readonly-role.yml` to an S3 bucket (e.g., `yml-python`) and make it publicly accessible for CloudFormation.
+Upload the `readonly-role.yml` CloudFormation template to an S3 bucket and make it publicly accessible for CloudFormation to use. For example, upload the file to `yml-python` bucket.
 
 ### Step 2: Deploy CloudFormation Stack
 
-Use the Launch Stack URL below to create the IAM role:
+To create the IAM role with read-only permissions, use the following Launch Stack URL:
 
 👉 [Launch Stack in AWS](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review?templateURL=https://yml-python.s3.amazonaws.com/readonly-role.yml&stackName=ReadOnlyAccessStack)
 
+This will create the **ReadOnlyAccessRole** in your AWS account with read-only access to EC2, S3, and other resources.
+
 ### Step 3: Run the Python Script
 
-Ensure your environment (EC2, Lambda, or local machine with IAM role) has permission to access CloudFormation, EC2, and S3.
+Make sure your environment (EC2, Lambda, or your local machine) is configured with the appropriate IAM permissions and roles to allow access to CloudFormation, EC2, and S3 resources.
 
-Run the script:
+To fetch inventory details of resources in the stack, run the Python script:
 
-```bash
-python3 fetch_stack_inventory.py
+1. **Install dependencies**:
+   Make sure you have Python 3.6+ and the `boto3` library installed. Install `boto3` using pip:
 
-Fetching stack resources for: ReadOnlyAccessStack
+   ```bash
+   pip install boto3
+   ```
 
-✅ Stack 'ReadOnlyAccessStack' status: CREATE_COMPLETE
-- AWS::IAM::Role: ReadOnlyAccessRole
+2. **Run the Python script**:
 
-🔍 EC2 Instances:
-  - Instance ID: i-1234567890abcdef0 | State: running
+   ```bash
+   python3 fetch_stack_inventory.py
+   ```
 
-🔍 S3 Buckets:
-  - Bucket Name: yml-python
+   **Expected Output**:
 
-✅ Requirements
-Python 3.6+
+   ```bash
+   Fetching stack resources for: ReadOnlyAccessStack
 
-boto3 (pip install boto3)
+   ✅ Stack 'ReadOnlyAccessStack' status: CREATE_COMPLETE
+   - AWS::IAM::Role: ReadOnlyAccessRole
 
-AWS IAM Role or EC2 Instance Profile with permissions (no access key used)
+   🔍 EC2 Instances:
+     - Instance ID: i-1234567890abcdef0 | State: running
 
-🔐 Security Note
-No credentials are stored or passed in the script. IAM permissions are assumed from the execution environment.
+   🔍 S3 Buckets:
+     - Bucket Name: yml-python
+   ```
 
-👤 Author
-Prem Prakash Jena
-GitHub | Portfolio
+The script will output the EC2 instances and S3 buckets created by the CloudFormation stack, based on the resources associated with the stack.
 
+---
+
+## ✅ Requirements
+
+- **Python 3.6+**
+- **boto3** (install via `pip install boto3`)
+
+### AWS IAM Permissions
+
+- The script assumes IAM permissions from the environment, such as EC2 Instance Profiles or Lambda Execution Role.
+- No explicit credentials (access keys or secret keys) are used or hardcoded in the script.
+
+---
+
+## 🔐 Security Note
+
+The script does **not store** or **pass** any credentials explicitly. IAM permissions are assumed from the environment in which the script runs, such as an EC2 instance or Lambda function that has the appropriate IAM role attached.
+
+### Ensure the following permissions are granted:
+
+- **CloudFormation**: `DescribeStacks`, `DescribeStackResources`
+- **EC2**: `DescribeInstances`
+- **S3**: `ListBuckets`
+
+---
+
+## 👤 Author
+
+**Prem Prakash Jena**  
+GitHub: [prem-pjena](https://github.com/prem-pjena)  
+Portfolio: [devops-portfolio-five.vercel.app](https://devops-portfolio-five.vercel.app/)
+
+---
+
+### License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+### Notes:
+
+- The CloudFormation template (`readonly-role.yml`) creates a role with read-only permissions for several AWS services.
+- The Python script assumes IAM permissions from the execution environment (EC2, Lambda, etc.) and fetches inventory details for EC2 and S3 resources.
